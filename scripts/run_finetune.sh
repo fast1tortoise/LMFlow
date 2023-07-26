@@ -13,21 +13,20 @@ project_dir=$(cd "$(dirname $0)"/..; pwd)
 output_dir=${project_dir}/output_models/${exp_id}
 log_dir=${project_dir}/log/${exp_id}
 
-dataset_path=${project_dir}/data/alpaca/train
+dataset_path=${project_dir}/data/example_dataset/train
 
 mkdir -p ${output_dir} ${log_dir}
 
 deepspeed ${deepspeed_args} \
   examples/finetune.py \
-    --model_name_or_path gpt2 \
+    --model_name_or_path /root/fan.yang/model/chinese-llm \
     --dataset_path ${dataset_path} \
     --output_dir ${output_dir} --overwrite_output_dir \
-    --num_train_epochs 0.01 \
+    --num_train_epochs 1 \
     --learning_rate 2e-5 \
-    --block_size 512 \
+    --block_size 64 \
     --per_device_train_batch_size 1 \
     --deepspeed configs/ds_config_zero3.json \
-    --bf16 \
     --run_name finetune \
     --validation_split_percentage 0 \
     --logging_steps 20 \

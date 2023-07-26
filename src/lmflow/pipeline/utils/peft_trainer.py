@@ -48,6 +48,7 @@ class PeftSavingCallback(TrainerCallback):
         if folder is None:
             folder = ""
         peft_model_path = os.path.join(folder, "adapter_model")
+        # import pdb; pdb.set_trace()
         model.save_pretrained(peft_model_path)
 
     def on_train_end(self, args: TrainingArguments, state: TrainerState,

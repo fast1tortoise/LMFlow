@@ -53,15 +53,15 @@ def main():
     )
     inferencer_args = pipeline_args
 
-    with open (pipeline_args.deepspeed, "r") as f:
-        ds_config = json.load(f)
+    # with open (pipeline_args.deepspeed, "r") as f:
+    #     ds_config = json.load(f)
 
     model = AutoModel.get_model(
         model_args,
         tune_strategy='none',
-        ds_config=ds_config,
         device=pipeline_args.device,
     )
+        # ds_config=ds_config,
 
     # We don't need input data, we will read interactively from stdin
     data_args = DatasetArguments(dataset_path=None)

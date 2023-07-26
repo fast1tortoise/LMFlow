@@ -6,9 +6,9 @@
 CUDA_VISIBLE_DEVICES=0 \
     deepspeed examples/evaluation.py \
     --answer_type text \
-    --model_name_or_path facebook/galactica-1.3b \
+    --model_name_or_path /root/fan.yang/model/chinese-llm \
     --lora_model_path output_models/finetune_with_lora \
-    --dataset_path data/alpaca/test \
+    --dataset_path data/example_dataset/test \
     --prompt_structure "Input: {input}" \
     --deepspeed examples/ds_config.json \
     --inference_batch_size_per_device 1 \

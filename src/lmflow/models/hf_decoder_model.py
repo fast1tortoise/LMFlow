@@ -97,7 +97,7 @@ class HFDecoderModel(DecoderModel, Tunable):
         tune_strategy='normal',
         ds_config=None,
         device="gpu",
-        use_accelerator=False,
+        use_accelerator=True,
         *args,
         **kwargs
     ):
@@ -153,7 +153,7 @@ class HFDecoderModel(DecoderModel, Tunable):
         if model_args.config_name:
             config = AutoConfig.from_pretrained(model_args.config_name, **config_kwargs)
         elif model_args.model_name_or_path:
-            config = AutoConfig.from_pretrained(model_args.model_name_or_path, **config_kwargs)
+            config = AutoConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True, **config_kwargs)
         else:
             config = CONFIG_MAPPING[model_args.model_type]()
             logger.warning("You are instantiating a new config instance from scratch.")
@@ -223,6 +223,8 @@ class HFDecoderModel(DecoderModel, Tunable):
                     revision=model_args.model_revision,
                     use_auth_token=True if model_args.use_auth_token else None,
                     torch_dtype=torch_dtype,
+                    load_in_8bit=model_args.use_int8,
+                    device_map="auto"
                 )
             else:
                 model = AutoModelForCausalLM.from_config(config)
@@ -243,6 +245,7 @@ class HFDecoderModel(DecoderModel, Tunable):
                     target_modules=lora_target_modules,
                 )
                 model = get_peft_model(model, peft_config)
+                # model.base_model.tie_weights()
                 model.print_trainable_parameters()
 
             # We resize the embeddings only when necessary to avoid index errors.
@@ -266,7 +269,7 @@ class HFDecoderModel(DecoderModel, Tunable):
                         offload_folder="offload",
                         offload_state_dict=True,
                         torch_dtype=torch_dtype,
-                        load_in_8bit = model_args.use_int8
+                        load_in_8bit = True
                     )
                 if peft_model_id is not None:
                     self.backend_model = PeftModel.from_pretrained(
@@ -537,7 +540,7 @@ class HFDecoderModel(DecoderModel, Tunable):
             return self.tokenizer.decode(input, *args, **kwargs)
 
 
-    def inference(self, inputs, use_accelerator=False, *args, **kwargs):
+    def inference(self, inputs, use_accelerator=True, *args, **kwargs):
         """
         Perform generation process of the model.
     
